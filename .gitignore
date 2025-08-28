@@ -8,7 +8,5 @@ wheels/
 # Virtual environments
 .venv
 tests/
-original_resumes/
-converted_resumes/
 uv.lock
 data/
