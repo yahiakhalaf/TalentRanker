@@ -1,6 +1,8 @@
 from typing import  List, Optional
 from pydantic import BaseModel, Field
 
+# Resume Models
+#######################################
 class Contact(BaseModel):
     """Contact information model."""
     email: Optional[str] = Field(None, description="Email address")
@@ -116,7 +118,8 @@ default_resume = ResumeData(
             books=[]
         )
 
-
+# Job Requirements Models
+#######################################
 class JobRequirementsData(BaseModel):
     """
     Structured data model for extracting key requirements from a job description.
@@ -147,3 +150,45 @@ default_job_requirements = JobRequirementsData(
     preferred_education=None,
     preferred_domain_knowledge=[]
 )
+
+# Ranker Models
+#######################################
+class ContactInfo(BaseModel):
+    """Contact information model."""
+    phone: str = Field(default="", description="Phone number")
+    linkedin: str = Field(default="", description="LinkedIn profile URL")
+    email: str = Field(default="", description="Email address")
+
+# Scoring Models
+class IndividualScore(BaseModel):
+    """Individual scoring model for different aspects."""
+    job_title_relevance: float = Field(description="Score for job title/role relevance (0-100)")
+    experience_years_match: float = Field(description="Score for experience years matching requirements (0-100)")
+    education_match: float = Field(description="Score for required education match (0-100)")
+    experience_relevance: float = Field(description="Score for work experience relevance (0-100)")
+    skills_match: float = Field(description="Score for required technical skills match (0-100)")
+    soft_skills_relevance: float = Field(description="Score for soft skills relevance (0-100)")
+    certifications_match: float = Field(description="Score for certifications match (0-100)")
+    domain_knowledge_match: float = Field(description="Score for domain knowledge match (0-100)")
+    languages_match: float = Field(description="Score for language requirements match (0-100)")
+    preferred_education_relevance: float = Field(description="Score for preferred education relevance (0-100)")
+    preferred_qualifications_relevance: float = Field(description="Score for preferred skills and domain knowledge combined (0-100)")
+
+class CandidateMatch(BaseModel):
+    """Candidate matching information."""
+    name: str = Field(description="Candidate's full name")
+    file_name: str = Field(description="Resume file name")
+    job_title: Optional[str] = Field(None, description="Current job title or desired position")
+    contact: ContactInfo = Field(description="Contact information")
+    scores: IndividualScore = Field(description="Individual scores for different aspects")
+    overall_score: float = Field(description="Overall score (0-100)")
+
+class Candidates(BaseModel):
+    candidates: List[CandidateMatch] = Field(default_factory=list, description="List of matched candidates")
+
+class JobMatchingResult(BaseModel):
+    """Complete job matching result."""
+    job_title: str = Field(description="Job title")
+    job_file_name: str = Field(description="Job description file name")
+    candidates: Candidates = Field(default_factory=list, description="List of matched candidates")
+
