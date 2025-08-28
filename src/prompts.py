@@ -89,3 +89,37 @@ Extract all available information following the above guidelines and return stru
 """
 
 
+JOB_DESCRIPTION_EXTRACTION_PROMPT = """
+You are an expert HR  specializing in extracting key requirements from job descriptions. Your goal is to parse the provided text and structure the output according to a predefined schema.
+
+## EXTRACTION RULES:
+
+1.  **Job Title**: The official and complete job title (e.g., "Senior Software Engineer").
+2.  **Responsibilities**: A comprehensive list of the core duties and tasks associated with the role. Each item in the list should be a single, concise sentence or a very brief phrase.
+3.  **Required Skills**: A list of essential technical skills explicitly stated as mandatory. Break down skill groups into individual components (e.g., "ETL tools like Hadoop, Kafka, Spark" should be listed as ["Hadoop", "Kafka", "Spark"]).
+4.  **Preferred Skills**: A list of any skills, tools, frameworks, or vendors that are mentioned as "preferred," "a plus," or "beneficial." Apply the same breakdown rule as for required skills.
+5.  **Soft Skills**: A list of non-technical skills mentioned, such as communication, teamwork, leadership, problem-solving, or adaptability.
+6.  **Required Education**: The minimum mandatory degree(s), field(s) of study, or educational level. Be specific (e.g., "Bachelor's degree in Computer Science").
+7.  **Preferred Education**: Any non-mandatory, desired, or preferred educational qualifications.
+8.  **Required Experience**: The minimum professional experience stated in years or a specific duration (e.g., "5+ years," "3-5 years").
+9.  **Required Certifications**: A list of mandatory professional certifications or licenses.
+10. **Required Domain Knowledge**: A list of essential industry, business, or technical domains.
+11. **Preferred Domain Knowledge**: A list of any non-essential, familiar with or desired industry or business expertise but not mandatory.
+
+## DATA QUALITY & OUTPUT FORMAT:
+
+-   Extract only factual information present in the text. **DO NOT INFER OR INVENT DATA.**
+-   For all list-based fields, return an empty list [] if no information is found.
+-   For single-value fields, return null if no information is found.
+-   Maintain a clear distinction between "Required" and "Preferred" items.
+-   Be thorough but concise, avoiding duplicate or redundant entries.
+
+## JOB DESCRIPTION TEXT:
+{job_description_text}
+
+Extract the information following the rules above and return the structured data.
+"""
+
+
+
+

@@ -115,3 +115,35 @@ default_resume = ResumeData(
             publications=[],
             books=[]
         )
+
+
+class JobRequirementsData(BaseModel):
+    """
+    Structured data model for extracting key requirements from a job description.
+    """
+    job_title: str = Field(description="The official title of the job.")
+    responsibilities: List[str] = Field(default_factory=list, description="A list of key responsibilities and duties of the role in concise manner.")
+    required_skills: List[str] = Field(default_factory=list, description="A list of minimum technical and professional skills required for the job.")
+    required_education: Optional[str] = Field(None, description="The minimum required educational background.")
+    required_experience_duration: Optional[str] = Field(None, description="The minimum required years or duration of experience (e.g., '2+ years').")
+    required_domain_knowledge: List[str] = Field(default_factory=list, description="A list of required industry or business domain knowledge.")
+    required_certifications: List[str] = Field(default_factory=list, description="A list of mandatory certifications.")
+    soft_skills: List[str] = Field(default_factory=list, description="A list of essential soft skills (e.g., communication, teamwork).")
+    preferred_skills: List[str] = Field(default_factory=list, description="A list of preferred or optional skills or frameworks.")
+    preferred_education: Optional[str] = Field(None, description="The preferred educational background.")
+    preferred_domain_knowledge: List[str] = Field(default_factory=list, description="A list of preferred industry or business domain knowledge.")
+
+
+default_job_requirements = JobRequirementsData(
+    job_title="Unknown",
+    responsibilities=[],
+    required_skills=[],
+    required_education=None,
+    required_experience_duration=None,
+    required_domain_knowledge=[],
+    required_certifications=[],
+    soft_skills=[],
+    preferred_skills=[],
+    preferred_education=None,
+    preferred_domain_knowledge=[]
+)
