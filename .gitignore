@@ -11,3 +11,4 @@ tests/
 original_resumes/
 converted_resumes/
 uv.lock
+data/
