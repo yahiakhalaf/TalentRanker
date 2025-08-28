@@ -121,5 +121,121 @@ Extract the information following the rules above and return the structured data
 """
 
 
+# Scoring Prompt
+RESUME_JOB_SCORING_PROMPT = """
+You are an expert HR professional and talent acquisition specialist. Your task is to evaluate how well a candidate's resume/s match a specific job description and provide detailed scoring across multiple dimensions.
+
+## EVALUATION CRITERIA:
+
+### Scoring Scale: 0-100 points for each category
+- **90-100**: Exceptional match - exceeds requirements significantly
+- **80-89**: Strong match - meets requirements with additional strengths
+- **70-79**: Good match - meets most requirements adequately
+- **60-69**: Fair match - meets some requirements with gaps
+- **50-59**: Weak match - significant gaps in requirements
+- **0-49**: Poor match - major misalignment with requirements
+
+## COMPARISON GUIDELINES:
+
+### WHAT TO COMPARE WITH WHAT:
+1. **Job Title Comparison**: Compare candidate's current/previous job titles with target job title
+2. **Responsibilities Comparison**: Compare job responsibilities with candidate's experience descriptions and job summary
+3. **Skills Comparison**: Compare required/preferred skills with candidate's listed skills
+4. **Education Comparison**: Compare education requirements with candidate's educational background
+5. **Experience Comparison**: Compare experience requirements with candidate's work history
+6. **Domain Comparison**: Compare industry/domain requirements with candidate's domain experience
+
+### 1. JOB TITLE RELEVANCE (0-100 points):
+**COMPARE**: Target job title ↔ Candidate's current/previous job titles + professional summary
+- Assess title similarity and role progression alignment
+- Evaluate if candidate's career path leads logically to this role
+- Look at role responsibilities alignment through titles
+
+### 2. EXPERIENCE YEARS MATCH (0-100 points):
+**COMPARE**: Required experience duration ↔ Candidate's total experience duration
+- Match minimum years requirement with candidate's total experience
+- Consider relevant experience vs. total experience
+- Assess if candidate meets or exceeds experience requirements
+- Account for quality vs. quantity of experience
+
+### 3. EDUCATION MATCH (0-100 points):
+**COMPARE**: Required education ↔ Candidate's education background
+- Match degree level requirements (Bachelor's, Master's, PhD)
+- Compare field of study requirements with candidate's major
+- Assess if education meets mandatory requirements
+
+### 4. EXPERIENCE RELEVANCE (0-100 points):
+**COMPARE**: Job responsibilities ↔ Candidate's experience descriptions + job summary
+- Match job duties with candidate's previous role responsibilities
+- Assess relevance of candidate's achievements to target role
+- Consider industry alignment
+- Evaluate leadership and management experience if required
+
+### 5. SKILLS MATCH (0-100 points):
+**COMPARE**: Required skills list ↔ Candidate's skills list
+- Direct matching of technical skills, tools, and technologies
+- Weight critical skills higher than nice-to-have skills
+
+### 6. SOFT SKILLS RELEVANCE (0-100 points):
+**COMPARE**: Required soft skills ↔ Evidence of soft skills in candidate's soft skills 
+- Look for communication, leadership, teamwork indicators
+- Assess problem-solving evidence through achievements
+- Consider management and mentoring experience
+- Evaluate collaboration and project management skills
+
+### 7. CERTIFICATIONS MATCH (0-100 points):
+**COMPARE**: Required certifications ↔ Candidate's certifications list
+- Direct matching of professional certifications
+- Consider certification currency and expiration dates
+
+### 8. DOMAIN KNOWLEDGE MATCH (0-100 points):
+**COMPARE**: Required domain knowledge ↔ Candidate's industry experience + domain knowledge
+- Match industry requirements with candidate's industry experience
+- Assess business domain understanding through experience descriptions
+- Consider sector-specific knowledge and regulations familiarity
+- Evaluate domain expertise depth and breadth
+
+### 9. LANGUAGES MATCH (0-100 points):
+**COMPARE**: Language requirements ↔ Candidate's languages list
+- Direct matching of required languages with candidate's language skills
+
+### 10. PREFERRED EDUCATION RELEVANCE (0-100 points):
+**COMPARE**: Preferred education ↔ Candidate's additional educational qualifications
+- Assess advanced degrees beyond minimum requirements
+- Look for education that adds value but isn't mandatory
+
+### 11. PREFERRED QUALIFICATIONS RELEVANCE (0-100 points):
+**COMPARE**: Preferred skills + preferred domain knowledge ↔ Candidate's additional qualifications
+- Assess nice-to-have skills that candidate possesses
+- Consider preferred domain knowledge and additional industry experience
+- Evaluate extra qualifications that enhance candidacy
+
+### 12. OVERALL SCORE CALCULATIONS:
+- The overall score should reflect how closely the candidate matches the job requirements as a single number (0-100).
+- Calculate it as a **weighted average** of the individual category scores using the specified weights:
+  {weights}
+- Apply the following calculation principles:
+  1. Ensure the final score is a **numeric value rounded to 2 decimal places**.
+  2. it can not exceed 100 or be less than 0.
+
+## ANALYSIS INSTRUCTIONS:
+1. **Use the comparison guidelines above** - Always compare the right elements with each other
+2. Provide objective, data-driven scoring for each of the 11 categories
+3. **Distinguish clearly between REQUIRED vs PREFERRED qualifications** when scoring
+4. Be consistent in your scoring methodology across all candidates
+5. **Justify scores based on concrete evidence** from both documents
+6. **For required categories**: Score based on how well candidate meets mandatory requirements
+7. **For preferred categories**: Score based on nice-to-have qualifications that add value
+
+## JOB DESCRIPTION:
+{job_description}
+
+## CANDIDATE RESUME/ES:
+{resume_data}
+
+Provide detailed scoring for these candidates against the job requirements for all 11 individual categories.
+**Follow the comparison guidelines strictly** - compare the right elements with each other as specified. 
+Focus on factual assessment and avoid bias. Use concrete examples from both documents to justify your scores. 
+"""
 
 
