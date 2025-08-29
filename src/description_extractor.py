@@ -79,20 +79,25 @@ def process_job_descriptions_directory(jds_dir: str, output_dir: str, llm: BaseL
     
     print(f"Found {total_files} job description files to process.")
     print(f"Output will be saved to: {output_dir}")
-    
+    processed=0
+    skipped=0
     for jd_file in jd_files:
+        output_file = output_path / f"{jd_file.stem}.json"
+        if output_file.exists():
+            print(f"Skipping already extracted file: {jd_file.name}")
+            skipped+=1
+            continue
         try:
             jd_data = process_job_description_file(jd_file, llm)
             
-            output_file = output_path / f"{jd_file.stem}.json"
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(jd_data, f, indent=2, ensure_ascii=False)
-            
+            processed+=1
             print(f"Successfully processed and saved: {output_file.name}")
             
         except Exception as e:
             print(f"Critical error processing {jd_file.name}: {str(e)}")
             continue
 
-    print("Job description processing completed!")
+    print(f"Job description processing completed! {processed} files extracted successfully, {skipped} skipped.")
     return

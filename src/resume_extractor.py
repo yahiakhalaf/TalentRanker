@@ -84,22 +84,27 @@ def process_resumes_directory( resumes_dir: str, output_dir: str, llm: BaseLangu
     print(f"Found {total_files} resume files to process")
     print(f"Output will be saved to: {output_dir}")
     
-    
+    processed=0
+    skipped=0
     for md_file in md_files:
+        output_file = output_path / f"{md_file.stem}.json"
+        if output_file.exists():
+            print(f"Skipping already extracted file: {md_file.name}")
+            skipped+=1
+            continue
         try:
             # Process the resume file
             resume_data = process_resume_file(md_file,llm)
             
             # Save each resume as a separate JSON file
-            output_file = output_path / f"{md_file.stem}.json"
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(resume_data, f, indent=2, ensure_ascii=False)            
-
+            processed+=1
         except Exception as e:
             print(f"Critical error processing {md_file.name}: {str(e)}")
             continue
 
-    print(f"Processing completed!")
+    print(f"Processing completed! {processed} files extracted successfully, {skipped} skipped.")
     return
 
 
