@@ -37,6 +37,7 @@ def rank_resumes(resumes_dir: str, jd_file: str, llm: BaseLanguageModel, output_
     Returns:
         None
     """
+
     resumes_path = Path(resumes_dir)
     jd_path = Path(jd_file)
     output_path = Path(output_dir)
@@ -63,22 +64,43 @@ def rank_resumes(resumes_dir: str, jd_file: str, llm: BaseLanguageModel, output_
         return
 
     print(f"Found {len(resume_files)} resume files to process for {jd_path.name}")
-    
-    prompt = PromptTemplate(
-        template=RESUME_JOB_SCORING_PROMPT,
-        input_variables=["job_description", "resume_data", "weights"]
-    )
-    # Configure LLM 
+
+    # Output file for this JD
+    output_file = output_path / f"{jd_path.stem}_ranked_resumes.json"
+
+    # Load existing results if any
+    existing_candidates = []
+    existing_file_names = set()
+    if output_file.exists():
+        try:
+            with open(output_file, "r", encoding="utf-8") as f:
+                existing_result = json.load(f)
+            existing_candidates = existing_result.get("candidates", {}).get("candidates", [])
+            existing_file_names = {Path(c.get("file_name")).stem for c in existing_candidates}
+            print(f"Found {len(existing_candidates)} already ranked candidates, skipping them.")
+        except Exception as e:
+            print(f"Error loading existing results, will overwrite. Reason: {str(e)}")
+
+    # Filter resumes: only process new ones
+    resume_files_to_process = [rf for rf in resume_files if rf.stem not in existing_file_names]
+    if not resume_files_to_process:
+        print("All candidates already ranked, nothing new to process.")
+        return
+
+    print(f"Processing {len(resume_files_to_process)} new resumes...")
+
+    prompt = PromptTemplate(template=RESUME_JOB_SCORING_PROMPT,input_variables=["job_description", "resume_data", "weights"])
     structured_llm = llm.with_structured_output(Candidates)
     chain = prompt | structured_llm
 
-    # Process resumes in batches
-    candidates = []
-    for i in range(0, len(resume_files), batch_size):
-        batch = resume_files[i:i + batch_size]
-        print(f"Processing batch {i // batch_size + 1} of {len(resume_files) // batch_size + 1}")
+    new_candidates = []
+    total_new = len(resume_files_to_process)
+    # Process in batches
+    for i in range(0, total_new, batch_size):
+        batch = resume_files_to_process[i:i + batch_size]
+        batch_num = (i // batch_size) + 1
+        print(f"Processing batch {batch_num} of {total_new // batch_size + 1}")
 
-        # Collect resume data for the batch
         batch_resume_data = []
         for resume_file in batch:
             try:
@@ -90,10 +112,8 @@ def rank_resumes(resumes_dir: str, jd_file: str, llm: BaseLanguageModel, output_
                 continue
 
         if not batch_resume_data:
-            print("No valid resumes in this batch, skipping.")
             continue
 
-        # Send batch to LLM
         try:
             batch_candidates_response = chain.invoke({
                 "job_description": json.dumps(jd_data),
@@ -101,45 +121,48 @@ def rank_resumes(resumes_dir: str, jd_file: str, llm: BaseLanguageModel, output_
                 "weights": json.dumps(weights)
             })
 
-            # Check if the response is a valid Candidates object
             if not isinstance(batch_candidates_response, Candidates):
-                print(f"LLM did not return a valid Candidates object. Got: {type(batch_candidates_response)}")
+                print("LLM did not return a valid Candidates object")
                 continue
 
-            # Add valid candidates to the list
             for candidate in batch_candidates_response.candidates:
                 try:
-                    candidates.append(candidate)
+                    new_candidates.append(candidate.dict())
                     print(f"Processed candidate: {candidate.name} from {candidate.file_name}")
                 except Exception as e:
-                    print(f"Error processing candidate for {candidate.file_name or 'unknown file'}: {str(e)}")
+                    print(f"Error processing candidate: {str(e)}")
                     continue
 
         except Exception as e:
             print(f"Error processing batch {i // batch_size + 1}: {str(e)}")
             continue
 
-    # Create job matching result
+    # Merge existing + new, ensuring no duplicates
+    candidate_dict = {c.get("file_name"): c for c in existing_candidates}  # Existing candidates by file_name
+    for candidate in new_candidates:
+        candidate_dict[candidate.get("file_name")] = candidate  # Overwrite or add new candidates
+
+    merged_candidates = list(candidate_dict.values())  # Convert back to list
+    merged_candidates = sorted(merged_candidates, key=lambda x: x.get("overall_score", 0), reverse=True)
+
+    # Save results
     result = JobMatchingResult(
         job_title=jd_data.get("job_title", "Unknown"),
         job_file_name=jd_path.name,
-        candidates=Candidates(candidates=sorted(candidates, key=lambda x: x.overall_score, reverse=True))
+        candidates=Candidates(candidates=merged_candidates)
     ).dict()
 
-    # Save results
-    output_file = output_path / f"{jd_path.stem}_ranked_resumes.json"
     try:
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
-        print(f"Results saved to: {output_file}")
+        print(f"Updated results saved to: {output_file}")
     except Exception as e:
         print(f"Error saving results: {str(e)}")
 
     print(f"Ranking completed for {jd_path.name}!")
 
 
-
-def rank_job_descriptions(resumes_dir: str, jds_dir: str, llm: BaseLanguageModel, output_dir: str,batch_size:int=5) -> None:
+def rank_job_descriptions(resumes_dir: str, jds_dir: str, llm: BaseLanguageModel, output_dir: str,batch_size:int=10) -> None:
     """
     Rank resumes against all job descriptions in a directory, saving each result in a separate JSON file.
 
