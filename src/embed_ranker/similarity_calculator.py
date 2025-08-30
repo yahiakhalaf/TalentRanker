@@ -54,10 +54,10 @@ def compute_fuzzy_education_match(jd_edu: str, resume_edus: List[str]) -> float:
     if not resume_edus:
         return 50.0
     
-    max_score = 30.0
+    max_score = 80
     for edu in resume_edus:
         score = max(fuzz.ratio(jd_edu, edu), fuzz.partial_ratio(jd_edu, edu), fuzz.token_set_ratio(jd_edu, edu))
         if score >= 90:
-            return 90.0  # Exact or near-exact match
-        max_score = max(max_score, min(score, 60.0))  # Cap partial matches at 60
+            return 95.0  # Exact or near-exact match
+        max_score = max(max_score, min(score, 90))  # Cap partial matches at 60
     return max_score
