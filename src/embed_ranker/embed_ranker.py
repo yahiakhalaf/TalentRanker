@@ -98,12 +98,12 @@ def rank_resumes(resumes_dir: str, jd_file: str, output_dir: str) -> None:
             jd_required_skills = set(jd_data.get("required_skills", []))
             resume_skills_set = set(resume_data.get("skills", []))
             skills_fuzzy_score = compute_fuzzy_match(jd_required_skills, resume_skills_set)
-            skills_match = 0.3 * skills_embedding_score + 0.7 * skills_fuzzy_score
+            skills_match = 0.5 * skills_embedding_score + 0.5 * skills_fuzzy_score
 
             jd_required_education = jd_data.get("required_education", "")
             resume_education_list = [e.get("degree", "") + " " + e.get("field_of_study", "") for e in resume_data.get("education", [])]
             education_fuzzy_score = compute_fuzzy_education_match(jd_required_education, resume_education_list)
-            education_match = 0.3 * education_embedding_score + 0.7 * education_fuzzy_score
+            education_match = 0.5 * education_embedding_score + 0.5 * education_fuzzy_score
 
             jd_experience_years = parse_years(jd_data.get("required_experience_duration", ""))
             resume_experience_years = parse_years(resume_data.get("experience_duration", ""))
