@@ -155,9 +155,9 @@ default_job_requirements = JobRequirementsData(
 #######################################
 class ContactInfo(BaseModel):
     """Contact information model."""
-    phone: str = Field(default="", description="Phone number")
-    linkedin: str = Field(default="", description="LinkedIn profile URL")
-    email: str = Field(default="", description="Email address")
+    phone: Optional[str] = Field(None, description="Phone number")
+    linkedin: Optional[str] = Field(None, description="LinkedIn profile URL")
+    email: Optional[str] = Field(None, description="Email address")
 
 # Scoring Models
 class IndividualScore(BaseModel):
