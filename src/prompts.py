@@ -214,9 +214,15 @@ You are an expert HR professional and talent acquisition specialist. Your task i
 - The overall score should reflect how closely the candidate matches the job requirements as a single number (0-100).
 - Calculate it as a **weighted average** of the individual category scores using the specified weights:
   {weights}
+- if the category has no data or requirements in job description, it should be excluded from the overall score calculation and normalized accordingly.
 - Apply the following calculation principles:
   1. Ensure the final score is a **numeric value rounded to 2 decimal places**.
   2. it can not exceed 100 or be less than 0.
+
+## important instructions:
+-if the a category has no data or requirements in job description its score should be -1
+-if the candidate has no data in a category that is required in the job description its score should be 50
+
 
 ## ANALYSIS INSTRUCTIONS:
 1. **Use the comparison guidelines above** - Always compare the right elements with each other
