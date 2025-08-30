@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 import pandas as pd
 
-from src.data_parser import convert_files_to_markdown
+from src.data_parser import convert_files_to_markdown, convert_files_to_markdown_with_ocr
 from src.resume_extractor import process_resumes_directory
 from src.description_extractor import process_job_descriptions_directory
 from src.resumes_ranker import rank_job_descriptions
+from src.embed_ranker.embed_ranker import rank_job_descriptions_with_embeddings
 
 
 
@@ -125,10 +126,9 @@ def generate_results_dataframes_by_job() -> Dict[str, pd.DataFrame]:
     return job_results
 
 
-
-def process_files_pipeline(resume_files: List[Any], jd_files: List[Any], llm) -> Tuple[str, Dict[str, pd.DataFrame]]:
+def process_files_pipeline_ai_enhanced(resume_files: List[Any], jd_files: List[Any], llm) -> Tuple[str, Dict[str, pd.DataFrame]]:
     """
-    Complete pipeline to process uploaded files and return results grouped by job description.
+    AI-enhanced pipeline using docling and AI extraction/ranking.
     
     Args:
         resume_files: List of uploaded resume files
@@ -149,30 +149,99 @@ def process_files_pipeline(resume_files: List[Any], jd_files: List[Any], llm) ->
         
         print(f"Saved {len(saved_resumes)} resumes and {len(saved_jds)} job descriptions\n")
         
-        # Convert files to markdown
-        print("Converting files to markdown...")
+        # Convert files to markdown using docling
+        print("Converting files to markdown with AI...")
         convert_files_to_markdown("data/resumes/raw", "data/resumes", "markdown")
         convert_files_to_markdown("data/job_descriptions/raw", "data/job_descriptions", "markdown")
         
-        # Extract structured data from resumes
-        print("\nExtracting resume data...")
+        # Extract structured data from resumes using AI
+        print("\nExtracting resume data with AI...")
         process_resumes_directory("data/resumes/markdown", "data/resumes/json", llm)
         
-        # Extract structured data from job descriptions
-        print("\nExtracting job description data...")
+        # Extract structured data from job descriptions using AI
+        print("\nExtracting job description data with AI...")
         process_job_descriptions_directory("data/job_descriptions/markdown", "data/job_descriptions/json", llm)
         
-        # Rank resumes against job descriptions
-        print("\nRanking candidates...")
+        # Rank resumes against job descriptions using AI
+        print("\nRanking candidates with AI...")
         rank_job_descriptions("data/resumes/json", "data/job_descriptions/json", llm, "data/rankings")
         
         # Generate results dataframes grouped by job description
         results_dfs = generate_results_dataframes_by_job()
         
-        return "Processing completed successfully!", results_dfs
+        return "Processing completed successfully with AI enhancement!", results_dfs
         
     except Exception as e:
-        return f"Error during processing: {str(e)}", {}
+        return f"Error during AI-enhanced processing: {str(e)}", {}
+
+
+def process_files_pipeline_ocr_embedding(resume_files: List[Any], jd_files: List[Any], llm) -> Tuple[str, Dict[str, pd.DataFrame]]:
+    """
+    OCR + embedding-based pipeline for faster processing.
+    
+    Args:
+        resume_files: List of uploaded resume files
+        jd_files: List of uploaded job description files
+        llm: Language model instance (used minimally)
+    
+    Returns:
+        Tuple of (status_message, dict of {job_title: dataframe})
+    """
+    try:        
+        # Save uploaded files
+        print("Saving uploaded files...")
+        saved_resumes = save_uploaded_files(resume_files, "resumes")
+        saved_jds = save_uploaded_files(jd_files, "job_descriptions")
+        
+        if not saved_resumes or not saved_jds:
+            return "Error: Please upload both resume and job description files.", {}
+        
+        print(f"Saved {len(saved_resumes)} resumes and {len(saved_jds)} job descriptions\n")
+        
+        # Convert files to markdown using OCR
+        print("Converting files to markdown with OCR...")
+        convert_files_to_markdown_with_ocr("data/resumes/raw", "data/resumes", "markdown")
+        convert_files_to_markdown_with_ocr("data/job_descriptions/raw", "data/job_descriptions", "markdown")
+        
+        # Extract structured data from resumes using AI (still needed for structured extraction)
+        print("\nExtracting resume data...")
+        process_resumes_directory("data/resumes/markdown", "data/resumes/json", llm)
+        
+        # Extract structured data from job descriptions using AI (still needed for structured extraction)
+        print("\nExtracting job description data...")
+        process_job_descriptions_directory("data/job_descriptions/markdown", "data/job_descriptions/json", llm)
+        
+        # Rank resumes using embedding-based approach
+        print("\nRanking candidates with embeddings...")
+        rank_job_descriptions_with_embeddings("data/resumes/json", "data/job_descriptions/json", "data/rankings")
+        
+        # Generate results dataframes grouped by job description
+        results_dfs = generate_results_dataframes_by_job()
+        
+        return "Processing completed successfully with OCR + embedding-based ranking!", results_dfs
+        
+    except Exception as e:
+        return f"Error during OCR + embedding processing: {str(e)}", {}
+
+
+def process_files_pipeline(resume_files: List[Any], jd_files: List[Any], llm, enhance_with_ai: bool = True) -> Tuple[str, Dict[str, pd.DataFrame]]:
+    """
+    Complete pipeline to process uploaded files and return results grouped by job description.
+    Routes to either AI-enhanced or OCR+embedding processing based on user selection.
+    
+    Args:
+        resume_files: List of uploaded resume files
+        jd_files: List of uploaded job description files
+        llm: Language model instance
+        enhance_with_ai: Boolean flag to determine processing method
+    
+    Returns:
+        Tuple of (status_message, dict of {job_title: dataframe})
+    """
+    if enhance_with_ai:
+        return process_files_pipeline_ai_enhanced(resume_files, jd_files, llm)
+    else:
+        return process_files_pipeline_ocr_embedding(resume_files, jd_files, llm)
 
 
 def save_dataframe_to_csv(job_title: str, job_results: Dict[str, pd.DataFrame]) -> str:

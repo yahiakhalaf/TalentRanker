@@ -30,6 +30,9 @@ def create_gradio_interface():
             align-items: center;
             margin-bottom: 10px;
         }
+        .enhance-checkbox {
+            margin: 1rem 0;
+        }
     """) as interface:
 
         # Header
@@ -57,10 +60,15 @@ def create_gradio_interface():
                     file_types=[".pdf", ".docx", ".txt", ".md", ".png", ".jpg", ".jpeg"],
                     elem_classes=["upload-box"]
                 )
-
-        with gr.Row():
-            process_btn = gr.Button("Process & Rank Candidates", variant="primary")
-            clear_btn = gr.Button("Clear", variant="secondary")
+            with gr.Column(scale=1):
+                process_btn = gr.Button("Process & Rank Candidates", variant="primary")
+                clear_btn = gr.Button("Clear", variant="secondary")
+                enhance_ai_checkbox = gr.Checkbox(
+                    label="Enhance ranking with AI",
+                    value=False,
+                    info="Use AI for enhanced extraction and scoring.",
+                    elem_classes=["enhance-checkbox"]
+                )
 
         status_output = gr.Textbox(label="Status", interactive=False, max_lines=3)
 
@@ -69,10 +77,10 @@ def create_gradio_interface():
 
         results_section = gr.Column(visible=False)
 
-        def process_files(resumes, jds):
+        def process_files(resumes, jds, enhance_with_ai):
             if not resumes or not jds:
                 return "Please upload both resume and job description files.", {}, gr.update(visible=False)
-            status, job_results = process_files_pipeline(resumes, jds, llm)
+            status, job_results = process_files_pipeline(resumes, jds, llm, enhance_with_ai)
             return status, job_results, gr.update(visible=True)
 
         def do_clear():
@@ -134,7 +142,7 @@ def create_gradio_interface():
 
         process_btn.click(
             fn=process_files,
-            inputs=[resume_upload, jd_upload],
+            inputs=[resume_upload, jd_upload, enhance_ai_checkbox],
             outputs=[status_output, all_results_data, results_section],
         )
 
