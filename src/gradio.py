@@ -69,6 +69,12 @@ def create_gradio_interface():
                     info="Use AI for enhanced extraction and scoring.",
                     elem_classes=["enhance-checkbox"]
                 )
+                enhance_conversion_checkbox = gr.Checkbox(
+                    label="Enhance conversion with AI",
+                    value=False,
+                    info="Use Docling for document conversion (slower but more accurate).",
+                    elem_classes=["enhance-checkbox"]
+                )
 
         status_output = gr.Textbox(label="Status", interactive=False, max_lines=3)
 
@@ -77,10 +83,10 @@ def create_gradio_interface():
 
         results_section = gr.Column(visible=False)
 
-        def process_files(resumes, jds, enhance_with_ai):
+        def process_files(resumes, jds, enhance_with_ai,enhance_conversion):
             if not resumes or not jds:
                 return "Please upload both resume and job description files.", {}, gr.update(visible=False)
-            status, job_results = process_files_pipeline(resumes, jds, llm, enhance_with_ai)
+            status, job_results = process_files_pipeline(resumes, jds, llm, enhance_with_ai,enhance_conversion)
             return status, job_results, gr.update(visible=True)
 
         def do_clear():
@@ -125,7 +131,7 @@ def create_gradio_interface():
                     
                     # DataFrame display
                     gr.DataFrame(
-                        value=df[["Candidate Name", "Current Job Title", "Phone", "Email", "LinkedIn", "Overall Score", "Resume File"]],
+                        value=df[["Rank","Candidate Name", "Current Job Title", "Phone", "Email", "LinkedIn", "Overall Score", "Resume File"]],
                         interactive=True,
                         wrap=True,
                         label=f"Results for {job_title}"
@@ -142,7 +148,7 @@ def create_gradio_interface():
 
         process_btn.click(
             fn=process_files,
-            inputs=[resume_upload, jd_upload, enhance_ai_checkbox],
+            inputs=[resume_upload, jd_upload, enhance_ai_checkbox,enhance_conversion_checkbox],
             outputs=[status_output, all_results_data, results_section],
         )
 
