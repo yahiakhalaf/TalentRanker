@@ -4,21 +4,8 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.language_models import BaseLanguageModel
 from src.utils import  Candidates, JobMatchingResult
 from src.prompts import RESUME_JOB_SCORING_PROMPT
-
-
-weights = {
-        "job_title_relevance": 0.03,
-        "experience_years_match": 0.20,
-        "education_match": 0.20,
-        "experience_relevance": 0.08,
-        "skills_match": 0.20,
-        "soft_skills_relevance": 0.04,
-        "certifications_match": 0.05,
-        "domain_knowledge_match": 0.04,
-        "languages_match": 0.10,
-        "preferred_education_relevance": 0.03,
-        "preferred_qualifications_relevance": 0.03
-    }
+from src.config_loader import config
+weights = config["scoring"]["weights"]
 
 
 def rank_resumes(resumes_dir: str, jd_file: str, llm: BaseLanguageModel, output_dir: str, batch_size: int = 10) -> None:

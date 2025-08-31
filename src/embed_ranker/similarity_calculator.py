@@ -2,9 +2,8 @@ from .embed_utils import normalize_text
 from typing import List
 from fuzzywuzzy import fuzz
 from sentence_transformers import SentenceTransformer, util
-
-sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
-
+from ..config_loader import config
+sentence_model = SentenceTransformer(config["models"]["sentence_transformer"])
 
 def encode_data(text: str):
     """
@@ -23,9 +22,9 @@ def calculate_similarity(embedding1, embedding2) -> float:
     Returns -1 if the first embedding is None, or 50.0 if the second is None.
     """
     if embedding1 is None:
-        return -1.0
+        return config["defaults"]["no_data_score"]
     if embedding2 is None:
-        return 50.0
+        return config["defaults"]["missing_requirement_score"]
     return util.cos_sim(embedding1, embedding2).item() * 100
 
 
@@ -33,9 +32,9 @@ def compute_fuzzy_match(set1: set, set2: set) -> float:
     """Compute fuzzy match score between two sets of strings."""
     set1, set2 = set(normalize_text(s) for s in set1), set(normalize_text(s) for s in set2)
     if not set1:
-        return -1  # Return -1 if first input is empty
+        return config["defaults"]["no_data_score"]
     if not set2:
-        return 50  # Return 50 if first input not empty but second is empty
+        return config["defaults"]["missing_requirement_score"]
     
     max_scores = []
     for s1 in set1:
@@ -50,9 +49,9 @@ def compute_fuzzy_education_match(jd_edu: str, resume_edus: List[str]) -> float:
     jd_edu = normalize_text(jd_edu)
     resume_edus = [normalize_text(e) for e in resume_edus]
     if not jd_edu:
-        return -1.0
+        return config["defaults"]["no_data_score"]
     if not resume_edus:
-        return 50.0
+        return config["defaults"]["missing_requirement_score"]
     
     max_score = 80
     for edu in resume_edus:
