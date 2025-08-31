@@ -10,8 +10,10 @@ from src.resume_extractor import process_resumes_directory
 from src.description_extractor import process_job_descriptions_directory
 from src.resumes_ranker import rank_job_descriptions
 from src.embed_ranker.embed_ranker import rank_job_descriptions_with_embeddings
+from src.config_loader import config
 
-
+resumes_config=config["data"]["directories"]["resumes"]
+job_config=config["data"]["directories"]["job_descriptions"]
 
 def save_uploaded_files(files: List[Any], file_type: str) -> List[str]:
     """
@@ -28,7 +30,8 @@ def save_uploaded_files(files: List[Any], file_type: str) -> List[str]:
         return []
     
     saved_files = []
-    raw_dir = Path(f"data/{file_type}/raw")    
+    raw_dir_str = config["data"]["directories"][file_type]["raw"]
+    raw_dir = Path(raw_dir_str)  
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     for file in files:
@@ -58,8 +61,9 @@ def find_original_raw_file(processed_filename: str) -> str:
     Returns:
         Path to the original raw file or empty string if not found
     """
+    
     try:
-        raw_resumes_dir = Path("data/resumes/raw")
+        raw_resumes_dir = Path(config["data"]["directories"]["resumes"]["raw"])
         
         # Remove extension from processed filename to match with raw files
         base_name = Path(processed_filename).stem
@@ -83,7 +87,7 @@ def generate_results_dataframes_by_job() -> Dict[str, pd.DataFrame]:
     Returns:
         Dictionary with job titles as keys and nested dictionaries as values
     """
-    rankings_dir = Path("data/rankings")
+    rankings_dir = Path(config["data"]["directories"]["rankings"])
     job_results = {}
     
     # Load all ranking result files
@@ -157,23 +161,25 @@ def process_files_pipeline_ai_enhanced(resume_files: List[Any], jd_files: List[A
         # Replace the conversion section in both functions with:
         if enhance_conversion:
             print("Converting files to markdown with AI (Docling)...")
-            convert_files_to_markdown("data/resumes/raw", "data/resumes", "markdown")
-            convert_files_to_markdown("data/job_descriptions/raw", "data/job_descriptions", "markdown")
+            convert_files_to_markdown(resumes_config["raw"],  resumes_config["sub"], "markdown")
+            convert_files_to_markdown(job_config["raw"], job_config["sub"], "markdown")
         else:
             print("Converting files to markdown with OCR...")
-            convert_files_to_markdown_with_ocr("data/resumes/raw", "data/resumes", "markdown")
-            convert_files_to_markdown_with_ocr("data/job_descriptions/raw", "data/job_descriptions", "markdown")
+            convert_files_to_markdown_with_ocr(resumes_config["raw"],  resumes_config["sub"], "markdown")
+            convert_files_to_markdown_with_ocr(job_config["raw"], job_config["sub"], "markdown")
         # Extract structured data from resumes using AI
         print("\nExtracting resume data with AI...")
-        process_resumes_directory("data/resumes/markdown", "data/resumes/json", llm)
+        process_resumes_directory(resumes_config["markdown"],resumes_config["json"], llm)
         
         # Extract structured data from job descriptions using AI
         print("\nExtracting job description data with AI...")
-        process_job_descriptions_directory("data/job_descriptions/markdown", "data/job_descriptions/json", llm)
+        process_job_descriptions_directory(job_config["markdown"],job_config["json"], llm)
         
         # Rank resumes against job descriptions using AI
         print("\nRanking candidates with AI...")
-        rank_job_descriptions("data/resumes/json", "data/job_descriptions/json", llm, "data/rankings")
+        rank_job_descriptions(resumes_config["json"], 
+                              job_config["json"], llm, 
+                              config["data"]["directories"]["rankings"],batch_size=config["processing"]["batch_size"])
         
         # Generate results dataframes grouped by job description
         results_dfs = generate_results_dataframes_by_job()
@@ -210,23 +216,25 @@ def process_files_pipeline_ocr_embedding(resume_files: List[Any], jd_files: List
         # Replace the conversion section in both functions with:
         if enhance_conversion:
             print("Converting files to markdown with AI (Docling)...")
-            convert_files_to_markdown("data/resumes/raw", "data/resumes", "markdown")
-            convert_files_to_markdown("data/job_descriptions/raw", "data/job_descriptions", "markdown")
+            convert_files_to_markdown(resumes_config["raw"],  resumes_config["sub"], "markdown")
+            convert_files_to_markdown(job_config["raw"], job_config["sub"], "markdown")
         else:
             print("Converting files to markdown with OCR...")
-            convert_files_to_markdown_with_ocr("data/resumes/raw", "data/resumes", "markdown")
-            convert_files_to_markdown_with_ocr("data/job_descriptions/raw", "data/job_descriptions", "markdown")
+            convert_files_to_markdown_with_ocr(resumes_config["raw"],  resumes_config["sub"], "markdown")
+            convert_files_to_markdown_with_ocr(job_config["raw"], job_config["sub"], "markdown")
         # Extract structured data from resumes using AI (still needed for structured extraction)
         print("\nExtracting resume data...")
-        process_resumes_directory("data/resumes/markdown", "data/resumes/json", llm)
+        process_resumes_directory(config["data"]["directories"]["resumes"]["markdown"],resumes_config["json"], llm)
         
         # Extract structured data from job descriptions using AI (still needed for structured extraction)
         print("\nExtracting job description data...")
-        process_job_descriptions_directory("data/job_descriptions/markdown", "data/job_descriptions/json", llm)
+        process_job_descriptions_directory(job_config["markdown"],job_config["json"], llm)
         
         # Rank resumes using embedding-based approach
         print("\nRanking candidates with embeddings...")
-        rank_job_descriptions_with_embeddings("data/resumes/json", "data/job_descriptions/json", "data/rankings")
+        rank_job_descriptions_with_embeddings(resumes_config["json"], 
+                                              job_config["json"], 
+                                              config["data"]["directories"]["rankings"])
         
         # Generate results dataframes grouped by job description
         results_dfs = generate_results_dataframes_by_job()
@@ -269,7 +277,7 @@ def save_dataframe_to_csv(job_title: str, job_results: Dict[str, pd.DataFrame]) 
     """
     try:
         # Create exports directory if it doesn't exist
-        exports_dir = Path("data/exports")
+        exports_dir = Path(config["data"]["directories"]["exports"])
         exports_dir.mkdir(parents=True, exist_ok=True)
         
         # Get the DataFrame for the specific job

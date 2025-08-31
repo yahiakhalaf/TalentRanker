@@ -1,19 +1,8 @@
 from ..utils import IndividualScore
+from ..config_loader import config
 import re
 # Weights for overall score calculation (total = 1.0)
-weights = {
-        "job_title_relevance": 0.03,
-        "experience_years_match": 0.20,
-        "education_match": 0.20,
-        "experience_relevance": 0.08,
-        "skills_match": 0.20,
-        "soft_skills_relevance": 0.04,
-        "certifications_match": 0.05,
-        "domain_knowledge_match": 0.04,
-        "languages_match": 0.10,
-        "preferred_education_relevance": 0.03,
-        "preferred_qualifications_relevance": 0.03
-    }
+weights = config["scoring"]["weights"]
 
 
 def parse_years(experience_str: str) -> float:

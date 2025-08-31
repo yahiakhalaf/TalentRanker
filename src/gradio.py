@@ -5,8 +5,10 @@ import gradio as gr
 import pandas as pd
 from langchain_google_genai import ChatGoogleGenerativeAI
 from src.ui_utils import process_files_pipeline,save_dataframe_to_csv
-
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash",temperature=0,api_key=os.getenv("GOOGLE_API_KEY"))
+from src.config_loader import config
+llm = ChatGoogleGenerativeAI(model=config["models"]["language_model"]["model_name"],
+                             temperature=config["models"]["language_model"]["temperature"],
+                             api_key=config["models"]["language_model"]["api_key"])
 
 
 def create_gradio_interface():
@@ -163,10 +165,10 @@ def create_gradio_interface():
 def main():
     interface = create_gradio_interface()
     interface.launch(
-        server_name="127.0.0.1",
-        server_port=7860,
-        share=False,
-        debug=True
+        server_name=config["ui"]["interface"]["server"]["host"],
+        server_port=config["ui"]["interface"]["server"]["port"],
+        share=config["ui"]["interface"]["server"]["share"],
+        debug=config["ui"]["interface"]["server"]["debug"]
     )
 
 if __name__ == "__main__":
