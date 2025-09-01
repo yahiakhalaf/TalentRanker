@@ -1,39 +1,39 @@
 # TalentRanker
 
-AI-Powered Resume Ranking & Candidate Matching System
+**AI-Powered Resume Ranking & Candidate Matching System**
 
 ## Overview
 
-TalentRanker is an intelligent recruitment tool that automates the process of matching candidates to job descriptions. It uses advanced AI techniques including natural language processing, embedding-based similarity matching, and structured data extraction to rank resumes against job requirements.
+TalentRanker is an intelligent recruitment tool that automates the process of matching candidates to job descriptions. It uses advanced AI techniques, including natural language processing, embedding-based similarity matching, and structured data extraction, to rank resumes against job requirements. This repository provides a lightweight deployment option that excludes Docling and table transformer models, using only OCR-based document conversion for a smaller footprint, ideal for resource-constrained environments.
 
 ## Features
 
-###  Core Capabilities
-- **Multi-format Support**: Processes PDFs, DOCX, TXT, MD, PNG, JPG, and JPEG files
-- **Dual Processing Modes**: 
-  - AI-Enhanced: Uses Docling + LLM for superior accuracy
-  - OCR + Embeddings: Faster processing with embedding-based ranking
-- **Intelligent Document Conversion**: Automatic OCR for scanned documents
-- **Structured Data Extraction**: Extracts comprehensive candidate information using AI
-- **Multi-dimensional Scoring**: Evaluates candidates across 11 different criteria
-- **Batch Processing**: Handles multiple resumes and job descriptions simultaneously
-- **Interactive Web Interface**: User-friendly Gradio-based UI
-- **Export Functionality**: CSV export for ranking results
+### Core Capabilities
 
-### Scoring Categories
+- **Multi-format Support**: Processes PDFs, DOCX, TXT, MD, PNG, JPG, and JPEG files.
+- **OCR + Embeddings Processing**: Fast processing with OCR-based document conversion and embedding-based ranking.
+- **Intelligent Document Conversion**: Automatic OCR for scanned documents using PyMuPDF and Tesseract.
+- **Structured Data Extraction**: Extracts comprehensive candidate information using AI (Gemini-2.5-flash).
+- **Multi-dimensional Scoring**: Evaluates candidates across 11 different criteria.
+- **Batch Processing**: Handles multiple resumes and job descriptions simultaneously.
+- **Interactive Web Interface**: User-friendly Gradio-based UI.
+- **Export Functionality**: CSV export for ranking results.
+
+## Scoring Categories
+
 TalentRanker evaluates candidates across these dimensions:
 
-1. **Job Title Relevance** (3%)
-2. **Experience Years Match** (20%)
-3. **Education Match** (20%)
-4. **Experience Relevance** (8%)
-5. **Skills Match** (20%)
-6. **Soft Skills Relevance** (4%)
-7. **Certifications Match** (5%)
-8. **Domain Knowledge Match** (4%)
-9. **Languages Match** (10%)
-10. **Preferred Education Relevance** (3%)
-11. **Preferred Qualifications Relevance** (3%)
+- **Job Title Relevance** (3%)
+- **Experience Years Match** (20%)
+- **Education Match** (20%)
+- **Experience Relevance** (8%)
+- **Skills Match** (20%)
+- **Soft Skills Relevance** (4%)
+- **Certifications Match** (5%)
+- **Domain Knowledge Match** (4%)
+- **Languages Match** (10%)
+- **Preferred Education Relevance** (3%)
+- **Preferred Qualifications Relevance** (3%)
 
 ## Architecture
 
@@ -41,30 +41,32 @@ TalentRanker evaluates candidates across these dimensions:
 TalentRanker/
 ├── src/
 │   ├── config_loader.py          # Configuration management
-│   ├── data_parser.py             # Document-to-markdown conversion
-│   ├── resume_extractor.py        # AI-powered resume parsing
-│   ├── description_extractor.py   # Job description parsing
-│   ├── resumes_ranker.py          # AI-based ranking
-│   ├── ui_utils.py                # Pipeline orchestration
-│   ├── gradio.py                  # Web interface
-│   ├── prompts.py                 # LLM prompts
-│   ├── utils.py                   # Data models and utilities
+│   ├── data_parser.py            # Document-to-markdown conversion
+│   ├── resume_extractor.py       # AI-powered resume parsing
+│   ├── description_extractor.py  # Job description parsing
+│   ├── resumes_ranker.py         # AI-based ranking
+│   ├── ui_utils.py               # Pipeline orchestration
+│   ├── gradio.py                 # Web interface (standard local execution)
+│   ├── gradio_lightweight.py     # Web interface (lightweight Docker setup)
+│   ├── prompts.py                # LLM prompts
+│   ├── utils.py                 # Data models and utilities
 │   └── embed_ranker/
-│       ├── embed_ranker.py        # Embedding-based ranking
-│       ├── embed_utils.py         # Embedding utilities
+│       ├── embed_ranker.py       # Embedding-based ranking
+│       ├── embed_utils.py        # Embedding utilities
 │       └── similarity_calculator.py # Similarity calculations
 ├── config.yaml                    # Main configuration
-├── docker-compose.yml             # Docker deployment
-├── Dockerfile                     # Container definition
+├── docker-compose.yml             # Docker deployment (lightweight setup)
+├── Dockerfile_lightweight         # Container definition (lightweight setup)
 └── pyproject.toml                 # Python dependencies
 ```
 
 ## Installation
 
 ### Prerequisites
+
 - Python 3.12+
 - Google Gemini API key
-- Docker (optional)
+- Docker (required for lightweight setup)
 
 ### Option 1: Local Installation
 
@@ -103,7 +105,9 @@ TalentRanker/
    python -m src.gradio
    ```
 
-### Option 2: Docker Installation
+### Option 2: Lightweight Docker Installation
+
+The lightweight setup excludes Docling and table transformer models, using only OCR-based document conversion for a smaller Docker image.
 
 1. **Clone and build**
    ```bash
@@ -122,7 +126,7 @@ TalentRanker/
    ```
 
 4. **Access the application**
-   Open your browser to `http://localhost:8765`
+   Open your browser to http://localhost:8765
 
 ## Configuration
 
@@ -163,97 +167,132 @@ ui:
 
 ## Usage
 
-### Web Interface
+### Web Interface (Local Execution)
 
-1. **Start the application** using one of the installation methods above
+1. Start the application using the local installation method.
 2. **Upload files**:
-   - Resume files: Upload candidate resumes in supported formats
-   - Job description files: Upload job postings or descriptions
+   - Resume files: Upload candidate resumes in supported formats.
+   - Job description files: Upload job postings or descriptions.
+
 3. **Configure processing**:
-   - **Enhance ranking with AI**: Use LLM for detailed analysis (slower, more accurate)
-   - **Enhance conversion with AI**: Use Docling for document conversion (slower, better quality)
-4. **Process & rank**: Click "Process & Rank Candidates"
-5. **View results**: Results are displayed in tables grouped by job title
-6. **Export data**: Download CSV files for further analysis
+   - Enhance ranking with AI: Use LLM for detailed analysis (slower, more accurate).
+   - Enhance conversion with AI: Use Docling for document conversion (slower, better quality).
 
-### Processing Modes
+4. **Process & rank**: Click "Process & Rank Candidates".
+5. **View results**: Results are displayed in tables grouped by job title.
+6. **Export data**: Download CSV files for further analysis.
 
-#### AI-Enhanced Mode
-- Uses Google Gemini for structured data extraction
-- LLM-based candidate ranking with detailed scoring
-- Higher accuracy but slower processing
-- Best for detailed analysis and smaller batches
+### Web Interface (Lightweight Docker Setup)
 
-#### OCR + Embeddings Mode  
-- Uses OCR for document conversion
-- Embedding-based similarity matching
-- Faster processing for large volumes
-- Good balance of speed and accuracy
+1. Start the application using the lightweight Docker installation.
+2. **Upload files**:
+   - Resume files: Upload candidate resumes in supported formats.
+   - Job description files: Upload job postings or descriptions.
 
+3. **Configure processing**:
+   - Enhance ranking with AI: Use LLM for detailed analysis (slower, more accurate).
+   - Uses OCR-based document conversion (PyMuPDF + Tesseract).
+
+4. **Process & rank**: Click "Process & Rank Candidates".
+5. **View results**: Results are displayed in tables grouped by job title.
+6. **Export data**: Download CSV files for further analysis.
+
+## Processing Modes
+
+### AI-Enhanced Ranking Mode
+
+- Uses Google Gemini for structured data extraction and candidate ranking.
+- Higher accuracy but slower processing.
+- Best for detailed analysis and smaller batches.
+- Available in both local and lightweight Docker setups.
+
+### OCR + Embeddings Mode
+
+- Uses OCR (PyMuPDF + Tesseract) for document conversion.
+- Embedding-based similarity matching with all-MiniLM-L6-v2.
+- Faster processing for large volumes.
+- Default mode in the lightweight Docker setup; available in local execution.
 
 ## Data Processing Pipeline
 
-1. **File Upload & Storage**: Uploaded files are saved with unique identifiers
-2. **Document Conversion**: Files converted to markdown using either:
-   - Docling (AI-enhanced, higher quality)
-   - PyMuPDF + Tesseract OCR (faster)
-3. **Structured Extraction**: AI extracts structured data from documents
+### Lightweight Docker Setup
+
+1. **File Upload & Storage**: Uploaded files are saved with unique identifiers.
+2. **Document Conversion**: Files converted to markdown using PyMuPDF + Tesseract OCR.
+3. **Structured Extraction**: AI extracts structured data from documents.
 4. **Candidate Ranking**: Resumes ranked against job requirements using either:
-   - LLM-based detailed analysis
-   - Embedding similarity + fuzzy matching
-5. **Results Generation**: Ranked results displayed and exportable as CSV
+   - LLM-based detailed analysis.
+   - Embedding similarity + fuzzy matching.
+5. **Results Generation**: Ranked results displayed and exportable as CSV.
+
+### Local Execution
+
+1. **File Upload & Storage**: Uploaded files are saved with unique identifiers.
+2. **Document Conversion**: Files converted to markdown using either:
+   - Docling (AI-enhanced, higher quality).
+   - PyMuPDF + Tesseract OCR (faster).
+3. **Structured Extraction**: AI extracts structured data from documents.
+4. **Candidate Ranking**: Resumes ranked against job requirements using either:
+   - LLM-based detailed analysis.
+   - Embedding similarity + fuzzy matching.
+5. **Results Generation**: Ranked results displayed and exportable as CSV.
 
 ## Project Structure
 
 ### Core Components
 
-- **`config_loader.py`**: Manages configuration from YAML file with environment variable expansion
-- **`data_parser.py`**: Handles document conversion to markdown with OCR fallback
-- **`resume_extractor.py`**: Extracts structured data from resumes using AI
-- **`description_extractor.py`**: Extracts job requirements using AI
-- **`resumes_ranker.py`**: AI-based candidate ranking and scoring
-- **`embed_ranker/`**: Embedding-based ranking alternative
-- **`gradio.py`**: Web interface implementation
-- **`ui_utils.py`**: Pipeline orchestration and file management
+- **config_loader.py**: Manages configuration from YAML file with environment variable expansion.
+- **data_parser.py**: Handles document conversion to markdown with OCR fallback (local execution includes Docling).
+- **resume_extractor.py**: Extracts structured data from resumes using AI.
+- **description_extractor.py**: Extracts job requirements using AI.
+- **resumes_ranker.py**: AI-based candidate ranking and scoring.
+- **embed_ranker/**: Embedding-based ranking alternative.
+- **gradio.py**: Web interface implementation (local execution).
+- **gradio_lightweight.py**: Web interface implementation (lightweight Docker setup, OCR-only).
+- **ui_utils.py**: Pipeline orchestration and file management.
+- **docker-compose.yml**: Docker Compose for lightweight setup.
+- **Dockerfile_lightweight**: Container definition for lightweight setup.
 
-### Data Models
+## Data Models
 
 The system uses Pydantic models for structured data:
 
-- **`ResumeData`**: Complete resume information including experience, education, skills
-- **`JobRequirementsData`**: Structured job requirements and qualifications
-- **`CandidateMatch`**: Candidate scoring and ranking results
-- **`JobMatchingResult`**: Complete job matching results
+- **ResumeData**: Complete resume information including experience, education, skills.
+- **JobRequirementsData**: Structured job requirements and qualifications.
+- **CandidateMatch**: Candidate scoring and ranking results.
+- **JobMatchingResult**: Complete job matching results.
 
 ## Supported File Formats
 
 ### Input Formats
-- **Documents**: PDF, DOCX, TXT, MD
-- **Images**: PNG, JPG, JPEG (with OCR)
+
+- **Documents**: PDF, DOCX, TXT, MD.
+- **Images**: PNG, JPG, JPEG (with OCR).
 
 ### Output Formats
-- **JSON**: Structured data storage
-- **CSV**: Exportable ranking results
-- **Markdown**: Intermediate document format
- 
+
+- **JSON**: Structured data storage.
+- **CSV**: Exportable ranking results.
+- **Markdown**: Intermediate document format.
 
 ## Dependencies
 
 ### Core Dependencies
-- **Docling**: Advanced document processing
-- **LangChain**: LLM integration and prompting
-- **Sentence Transformers**: Embedding generation
-- **Gradio**: Web interface
-- **PyMuPDF**: PDF processing
-- **Pytesseract**: OCR capabilities
-- **FuzzyWuzzy**: String matching
+
+- **LangChain**: LLM integration and prompting.
+- **Sentence Transformers**: Embedding generation (all-MiniLM-L6-v2).
+- **Gradio**: Web interface.
+- **PyMuPDF**: PDF processing.
+- **Pytesseract**: OCR capabilities.
+- **FuzzyWuzzy**: String matching.
+- **Docling**: Advanced document processing (local execution only).
 
 ### AI Models
-- **Google Gemini 2.5 Flash**: Primary LLM for extraction and ranking
-- **all-MiniLM-L6-v2**: Sentence embeddings for similarity matching
 
+- **Google Gemini 2.5 Flash**: Primary LLM for extraction and ranking.
+- **all-MiniLM-L6-v2**: Sentence embeddings for similarity matching (both setups).
+- **EasyOCR**: OCR for scanned documents (both setups).
 
+---
 
-
-Built with ❤️ for modern recruitment teams
-
+*Built with ❤️ for modern recruitment teams*
