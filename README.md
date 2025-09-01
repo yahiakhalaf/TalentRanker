@@ -42,6 +42,7 @@ TalentRanker/
 ├── src/
 │   ├── config_loader.py          # Configuration management
 │   ├── data_parser.py            # Document-to-markdown conversion
+│   ├── data_parser_r.py          # Document-to-markdown conversion with ocr
 │   ├── resume_extractor.py       # AI-powered resume parsing
 │   ├── description_extractor.py  # Job description parsing
 │   ├── resumes_ranker.py         # AI-based ranking
@@ -296,3 +297,4 @@ The system uses Pydantic models for structured data:
 ---
 
 *Built with ❤️ for modern recruitment teams*
+
