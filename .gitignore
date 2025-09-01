@@ -10,4 +10,4 @@ wheels/
 tests/
 uv.lock
 data/
-
+.gradio

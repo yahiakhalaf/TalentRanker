@@ -25,3 +25,4 @@ tests/
 # Miscellaneous
 *.log
 .env
+.gradio
