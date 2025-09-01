@@ -5,7 +5,38 @@
 ## Overview
 
 TalentRanker is an intelligent recruitment tool that automates the process of matching candidates to job descriptions. It uses advanced AI techniques, including natural language processing, embedding-based similarity matching, and structured data extraction, to rank resumes against job requirements. This repository provides a lightweight deployment option that excludes Docling and table transformer models, using only OCR-based document conversion for a smaller footprint, ideal for resource-constrained environments.
+# Table of Contents
 
+- [Features](#features)
+  - [Core Capabilities](#core-capabilities)
+- [Scoring Categories](#scoring-categories)
+- [Architecture](#architecture)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Option 1: Local Installation](#option-1-local-installation)
+  - [Option 2: Lightweight Docker Installation](#option-2-lightweight-docker-installation)
+- [Configuration](#configuration)
+  - [Model Configuration](#model-configuration)
+  - [Scoring Weights](#scoring-weights)
+  - [Processing Settings](#processing-settings)
+- [Usage](#usage)
+  - [Web Interface (Local Execution)](#web-interface-local-execution)
+  - [Web Interface (Lightweight Docker Setup)](#web-interface-lightweight-docker-setup)
+- [Processing Modes](#processing-modes)
+  - [AI-Enhanced Ranking Mode](#ai-enhanced-ranking-mode)
+  - [OCR + Embeddings Mode](#ocr--embeddings-mode)
+- [Data Processing Pipeline](#data-processing-pipeline)
+  - [Lightweight Docker Setup](#lightweight-docker-setup)
+  - [Local Execution](#local-execution)
+- [Project Structure](#project-structure)
+  - [Core Components](#core-components)
+- [Data Models](#data-models)
+- [Supported File Formats](#supported-file-formats)
+  - [Input Formats](#input-formats)
+  - [Output Formats](#output-formats)
+- [Dependencies](#dependencies)
+  - [Core Dependencies](#core-dependencies)
+  - [AI Models](#ai-models)
 ## Features
 
 ### Core Capabilities
@@ -297,4 +328,5 @@ The system uses Pydantic models for structured data:
 ---
 
 *Built with ❤️ for modern recruitment teams*
+
 
