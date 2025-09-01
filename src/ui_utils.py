@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any
 import pandas as pd
 
-from src.data_parser import convert_files_to_markdown, convert_files_to_markdown_with_ocr
+from src.data_parser_ocr import convert_files_to_markdown_with_ocr
 from src.resume_extractor import process_resumes_directory
 from src.description_extractor import process_job_descriptions_directory
 from src.resumes_ranker import rank_job_descriptions
@@ -160,6 +160,8 @@ def process_files_pipeline_ai_enhanced(resume_files: List[Any], jd_files: List[A
         
         # Replace the conversion section in both functions with:
         if enhance_conversion:
+            from src.data_parser import convert_files_to_markdown
+
             print("Converting files to markdown with AI (Docling)...")
             convert_files_to_markdown(resumes_config["raw"],  resumes_config["sub"], "markdown")
             convert_files_to_markdown(job_config["raw"], job_config["sub"], "markdown")
@@ -215,6 +217,7 @@ def process_files_pipeline_ocr_embedding(resume_files: List[Any], jd_files: List
         
         # Replace the conversion section in both functions with:
         if enhance_conversion:
+            from src.data_parser import convert_files_to_markdown
             print("Converting files to markdown with AI (Docling)...")
             convert_files_to_markdown(resumes_config["raw"],  resumes_config["sub"], "markdown")
             convert_files_to_markdown(job_config["raw"], job_config["sub"], "markdown")

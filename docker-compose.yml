@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  talentranker:
+    image: talentranker:lightweight
+    build:
+      context: .
+      dockerfile: Dockerfile_lightweight
+    ports:
+      - "8765:7860"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}

@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+
+# Data directories
+data/
+
+# Dependency lock files
+uv.lock
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Tests
+tests/
+
+# Miscellaneous
+*.log
+.env
