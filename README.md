@@ -253,10 +253,7 @@ The system uses Pydantic models for structured data:
 - **all-MiniLM-L6-v2**: Sentence embeddings for similarity matching
 
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 
 
 Built with ❤️ for modern recruitment teams
+
